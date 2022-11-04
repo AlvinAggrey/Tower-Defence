@@ -5,6 +5,8 @@
 #include <Windows.h>
 
 #include "GameController.h"
+#include "GAManager.h"
+
 
 using namespace std;
 
@@ -17,81 +19,49 @@ AIController::AIController()
 	m_step = 0;
 	m_GAManager.InitPop();
 
-	std::cout << "---Population---" << std::endl;
-	for (auto chromosome : m_GAManager.m_population)
-	{
-		std::cout << chromosome.name << " ";
-		for (auto geneSegment: chromosome.m_chromosome)
-		{
-			std::cout << geneSegment << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "---end---"<< std::endl;
+	//Individual child = m_GAManager.OnePointCrossOver(0, 1);
 
-	Individual child = m_GAManager.OnePointCrossOver(0, 1);
-
-	std::cout << child.name << " ";
-	for (auto geneSegment : child.m_chromosome)
-	{
-		std::cout << geneSegment << " ";
-	}
-	std::cout << "---end---" << std::endl;
+	//std::cout << child.name << " ";
+	//for (auto geneSegment : child.m_chromosome)
+	//{
+	//	std::cout << geneSegment << " ";
+	//}
+	//std::cout << "---end---" << std::endl;
 
 }
 
 AIController::~AIController()
 {
-
+	
 }
 
 void AIController::gameOver()
 {
 }
-void AIController::Decision()
+void AIController::Decision(int individual, int generation)
 {
-	vector<int> chromosome = m_GAManager.m_population[1].m_chromosome;
+	//vector<Individual>* gen = m_GAManager.GetCurGen();
 
-	if (m_step != (int)chromosome.size())
-	{
-		TowerType Tower = (TowerType)chromosome[m_step];
+	//vector<int> chromosome = (*gen)[individual].m_chromosome;
 
-		int x = chromosome[m_step + 1];
-		int y = chromosome[m_step + 2];
+	//if (m_step != (int)chromosome.size())
+	//{
+	//	TowerType Tower = (TowerType)chromosome[m_step];
 
-	
-		int tamsRequired = m_gameState->getTowerProps(Tower)["tam"];
+	//	int x = chromosome[m_step + 1];
+	//	int y = chromosome[m_step + 2];
 
-		if (m_gameState->getTams()>= tamsRequired)
-		{
-			addTower(Tower, x, y);
-			m_step += 3;
-		}
-	}
+	//
+	//	int tamsRequired = m_gameState->getTowerProps(Tower)["tam"];
+
+	//	if (m_gameState->getTams() >= tamsRequired)
+	//	{
+	//		addTower(Tower, x, y);
+	//		m_step += 3;
+	//	}
+	//}
 
 }
-//const int popSize = 6;
-//const int genesPerChrom = 20;
-//const int geneSize = 3;
-//const int chromSize = genesPerChrom * geneSize;
-//
-////create chroms
-//for (int i = 0; i < popSize; i++)
-//{
-//
-//	int chromosome[chromSize];
-//	for (int i = 0; i < chromSize; i += 3)
-//	{
-//		//unit
-//		chromosome[i] = rand() % 3;
-//		//screen Dimension 0,0 to 25,17
-//		//pos x and y
-//		chromosome[i + 1] = rand() % 25;
-//		chromosome[i + 2] = rand() % 17;
-//
-//	}
-//	std::cout << chromosome << "\n";
-//}
 
 void AIController::update()
 {
@@ -108,8 +78,6 @@ void AIController::update()
 
 	}
 
-	//GAManager::Instance()->Update(m_Timer->elapsedSeconds());
-
 	// this might be useful? Monsters killed
 	static int monstersKilled = 0;
 
@@ -118,9 +86,9 @@ void AIController::update()
 		monstersKilled = m_gameState->getMonsterEliminated();
 	}
 
-	std::cout << "Balls" << endl;
-
-	Decision();
+	//Decision(1,2);
+	m_GAManager.CalcFitness();
+	m_GAManager.NextGen();
 
 	recordScore();
 }

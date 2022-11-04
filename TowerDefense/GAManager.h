@@ -1,26 +1,22 @@
 #pragma once
 #include <vector>
 #include <string>
-
-struct Individual
-{
-	Individual() {};
-	std::vector<int> m_chromosome;
-	float m_fitness = 0;
-	std::string name;
-};
+#include "Roulette.h"
+#include "Individual.h"
 
 class GAManager
 {
 public:
-	//typedef chromosone;
-	std::vector<Individual> m_population;
+
+	std::vector<Individual> m_curGen;
+	std::vector<Individual> m_nextGen;
 
 	int m_chromSize;
 	int m_geneSize;
-	int m_popSize;
-	int m_digitsPerGene;
+	int m_genSize;
+
 	int m_totalIndiv;
+	int m_curGenNum;
 
 	GAManager();
 
@@ -29,31 +25,15 @@ public:
 	Individual GenIndiv();
 
 	void InitPop();
-	void Add();
-	void Replace();
 	void CalcFitness();
-	Individual OnePointCrossOver(int indiv1, int indiv2);
-};
+	void NextGen();
+	void printGen();
 
-//const int popSize = 6;
-//const int genesPerChrom = 20;
-//const int geneSize = 3;
-//const int chromSize = genesPerChrom * geneSize;
-//
-////create chroms
-//for (int i = 0; i < popSize; i++)
-//{
-//
-//	int chromosome[chromSize];
-//	for (int i = 0; i < chromSize; i += 3)
-//	{
-//		//unit
-//		chromosome[i] = rand() % 3;
-//		//screen Dimension 0,0 to 25,17
-//		//pos x and y
-//		chromosome[i + 1] = rand() % 25;
-//		chromosome[i + 2] = rand() % 17;
-//
-//	}
-//	std::cout << chromosome << "\n";
-//}
+	int GetGenNum();
+	std::vector<Individual>* GetCurGen();
+
+	//create next gen using roulette selection
+	std::vector<Individual> rouletteSelection(int childNum, std::vector<Individual>& prevGen);
+
+	Individual OnePointCrossOver(std::vector<int> parent1, std::vector<int> parent2);
+};

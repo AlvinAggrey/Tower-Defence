@@ -24,7 +24,7 @@ public:
 	void update();
 	bool addTower(TowerType type, int gridx, int gridy);
 	void gameOver();
-	void Decision();
+	void Decision(int individual, int generation);
 	int m_step;
 private:
 	GAManager m_GAManager;

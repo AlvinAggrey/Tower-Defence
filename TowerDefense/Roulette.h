@@ -1,21 +1,34 @@
 #pragma once
 #include <vector>
 #include <random>
+#include "Individual.h"
+
+struct Space
+{
+	Space();
+	Space(Individual* indiv, float size);
+	Individual* m_item;
+	float m_size;
+};
 
 class Roulette
 {
 	float m_sum;
-	std::vector<float> m_wheel;
+	std::vector<Space> m_wheel;
 
 public:
 	Roulette();
-	Roulette(std::vector<float> wheel);
 
-	void addSpace(float space);
-	float spin();
+	void addSpace(Space space);
+	void removeSpace(unsigned int index);
 	float calcPercentage(float num);
+	Space* find(Space space);
+	Space spin();
+
+	void clear();
 
 	//get set
-	std::vector<float> getWheel();
+	std::vector<Space> getWheel();
+
 };
 

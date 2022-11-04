@@ -1,5 +1,17 @@
 #include "GAManager.h"
+#include <iostream>
+
 #include <random>
+
+GAManager::GAManager()
+{
+	m_chromSize = 20;
+	m_geneSize = 3;
+
+	m_curGenNum = 0;
+	m_genSize = 4;
+	m_totalIndiv = 0;
+}
 
 //generate chromosome
 const std::vector<int> GAManager::GenChrom()
@@ -42,17 +54,9 @@ Individual GAManager::GenIndiv()
 	return indiv;
 }
 
-Individual GAManager::OnePointCrossOver(int indiv1, int indiv2)
+Individual GAManager::OnePointCrossOver(std::vector<int> parent1, std::vector<int> parent2)
 {
 	int crosspoint = ((m_chromSize/ 2) * m_geneSize);
-
-	std::vector<int> parent1;
-	std::vector<int> parent2;
-
-	parent1 = m_population[indiv1].m_chromosome;
-	parent2 = m_population[indiv2].m_chromosome;
-
-
 
 	Individual child;
 	child.name = GenName();
@@ -68,28 +72,86 @@ Individual GAManager::OnePointCrossOver(int indiv1, int indiv2)
 }
 
 
-GAManager::GAManager()
-{
-	m_population = {};
-
-	m_chromSize = 20;
-	m_geneSize = 3;
-	m_popSize = 4;
-	m_digitsPerGene = 3;
-	
-	m_totalIndiv = 0;
-}
-
 //create initial popluation
 void GAManager::InitPop()
 {
-	for (int i = 0; i < m_popSize; i++)
+	for (int i = 0; i < m_genSize; i++)
 	{
-		m_population.push_back(GenIndiv());
+		m_curGen.push_back(GenIndiv());
 		m_totalIndiv++;
 	}
+	printGen();
 }
 
 void GAManager::CalcFitness()
 {
+	for (int i = 0; i < (int)m_curGen.size(); i++)
+	{
+		m_curGen[i].m_fitness = 1;
+	}
+}
+
+void GAManager::NextGen()
+{
+	int childNum = 2;
+	
+	m_curGen = rouletteSelection(2, m_curGen);
+	m_curGenNum++;
+
+	printGen();
+}
+
+void GAManager::printGen()
+{
+	std::cout << "---Population-" << m_curGenNum << "---" << std::endl;
+	for (auto chromosome : m_curGen)
+	{
+		std::cout << chromosome.name << " ";
+		for (auto geneSegment : chromosome.m_chromosome)
+		{
+			std::cout << geneSegment << " ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "---end---" << std::endl;
+}
+printChild
+std::vector<Individual>* GAManager::GetCurGen()
+{
+	return &m_curGen;
+}
+
+std::vector<Individual> GAManager::rouletteSelection(int childNum, std::vector<Individual>& prevGen)
+{
+	std::vector<Individual> nextGen;
+	Roulette roulette;
+
+	
+	//add to roulette wheel
+	for (int i = 0; i < (int)prevGen.size(); i++)
+	{
+		Space space(&prevGen[i], prevGen[i].m_fitness);
+		roulette.addSpace(space);
+	}
+
+	//add children to nextGen
+	for (int i = 0; i < childNum; i++)
+	{
+		std::vector<int> parentChrom1 = roulette.spin().m_item->m_chromosome;
+		std::vector<int> parentChrom2 = roulette.spin().m_item->m_chromosome;
+
+		Individual child;// = OnePointCrossOver(parentChrom1, parentChrom2);
+		child.name = GenName();
+
+		nextGen.push_back(child);
+		m_totalIndiv++;
+	}
+	//add randomly generated indivs to nextGen
+	for (int i = childNum; i < m_genSize; i++)
+	{
+		nextGen.push_back(GenIndiv());
+		m_totalIndiv++;
+	}
+	
+	return nextGen;
 }
